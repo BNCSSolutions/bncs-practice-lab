@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @RestController
-@RequestMapping("/employees")
+@RequestMapping("/employee")
 public class EmployeeController {
 
     private final EmployeeService service;
@@ -16,14 +16,14 @@ public class EmployeeController {
     }
 
     // CREATE
-    @PostMapping("/add")
+    @PostMapping("/addEmp")
     public String addEmployee(@RequestBody Employee employee) {
         service.addEmployee(employee);
         return "Employee added";
     }
 
     // READ ALL
-    @GetMapping("/get")
+    @GetMapping("/getEmp")
     public List<Employee> getAllEmployees() {
         return service.getAllEmployees();
     }
