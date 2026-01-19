@@ -5,11 +5,11 @@ package com.bncs.Employee1.model;
 	@Data
 	public class Employee {
 		
-		int id;
-		String name;
-		int age;
-		String role;
-		double salary;
+		private int id;
+		private String name;
+		private int age;
+		private String role;
+		private double salary;
 		
 		public Employee() {
 			
