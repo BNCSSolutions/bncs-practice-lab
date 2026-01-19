@@ -1,41 +1,25 @@
 package com.bncs.empmanagement.service;
 
 import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.Optional;
 
 import com.bncs.empmanagement.model.Employee2;
-import com.bncs.empmanagement.repository.EmployeeRepo;
 
-@Service
-public class EmployeeService {
 
-	@Autowired
-	EmployeeRepo emprepo;
+public interface EmployeeService {
 	
-//  Create
-	public Employee2 insertdata( Employee2 employee) {
-		return emprepo.save(employee);
+
+	    boolean addEmp(Employee2 employee);
+
+	    boolean updateEmp(int id, double salary, String designation);
+
+	    boolean deleteEmp(int id);
+
+	    List<Employee2> getAllEmp();
+
+	    Optional<Employee2> searchEmpById(int id);
+
 	}
-//	Read All
-	public List<Employee2> getallempInfo(){
-		return emprepo.findAll();
-	}
-//	Read by Id
-	public Employee2 getbyId(int id) {
-		return emprepo.findById(id).orElse(null);
-	}
-	
-//	update 
-	public Employee2 updatedata( int id ,Employee2 emp) {
-		emp.setId(id);
-		return emprepo.save(emp);
-	}
-	
-//	delete 
-	public String deleteEmp(int id) {
-		emprepo.deleteById(id);
-		return "Deleted Successfully";
-	}
-}
+
+
+

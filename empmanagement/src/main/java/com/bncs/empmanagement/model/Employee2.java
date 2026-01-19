@@ -19,6 +19,8 @@ public class Employee2 {
 	private String designation;
 	private String department;
 	private String email;
+	private Gender gender;
+	private double salary;
 	
 	
 	
@@ -59,6 +61,26 @@ public class Employee2 {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public Gender getGender() {
+		return gender;
+	}
+
+	public void setGender(Gender gender) {
+		this.gender = gender;
+	}
+
+	public double getSalary() {
+		return salary;
+	}
+
+	public void setSalary(double salary) {
+		this.salary = salary;
+	}
+	
+
+	
+	
 	
 	
 	
