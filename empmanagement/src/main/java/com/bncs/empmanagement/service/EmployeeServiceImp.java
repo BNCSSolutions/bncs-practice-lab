@@ -1,81 +1,73 @@
 package com.bncs.empmanagement.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import com.bncs.empmanagement.model.Employee2;
+import com.bncs.empmanagement.repository.EmployeeRepo;
 
 @Service
-public  class EmployeeServiceImp implements EmployeeService {
-	
-	
-	    private Map<Integer, Employee2> empMap = new HashMap<>();
+public class EmployeeServiceImp implements EmployeeService {
 
-//	    Add Emp
-	    @Override
-	    public boolean addEmp(Employee2 employee) {
+	private EmployeeRepo repository;
 
-	        if (employee == null ||
-	            employee.getId() <= 0 ||
-	            employee.getSalary() < 0 ||
-	            employee.getName() == null || employee.getName().isBlank() ||
-	            employee.getDesignation() == null || employee.getDesignation().isBlank()) {
-	            return false;
-	        }
+//	     Constructor Injection
+	public EmployeeServiceImp(EmployeeRepo repository) {
+		this.repository = repository;
+	}
 
-//	         Duplicate id validation
-	        if (empMap.containsKey(employee.getId())) {
-	            return false;
-	        }
+//	    Add Employee
+	@Override
+	public boolean addEmp(Employee2 employee) {
 
-	        empMap.put(employee.getId(), employee);
-	        return true;
-	    }
+		if (employee == null || employee.getId() <= 0 || employee.getSalary() < 0 || employee.getName() == null
+				|| employee.getName().isBlank() || employee.getDesignation() == null
+				|| employee.getDesignation().isBlank()) {
+			return false;
+		}
+
+		repository.save(employee);
+		return true;
+	}
 
 //	    Update Employee
-	    @Override
-	    public boolean updateEmp(int id, double salary, String designation) {
+	@Override
+	public boolean updateEmp(int id, double salary, String designation) {
 
-	        if (salary < 0 || designation == null || designation.isBlank()) {
-	            return false;
-	        }
-
-	        Employee2 emp = empMap.get(id);
-	        if (emp == null) {
-	            return false;
-	        }
-
-	        emp.setSalary(salary);
-	        emp.setDesignation(designation);
-	        return true;
+	    if (salary < 0 || designation == null || designation.isBlank()) {
+	        return false;
 	    }
 
-//	    Delete Employee
-	    @Override
-	    public boolean deleteEmp(int id) {
-	        return empMap.remove(id) != null;
-	    }
-
-//	     Get all employees
-	    @Override
-	    public List<Employee2> getAllEmp() {
-	        return new ArrayList<>(empMap.values());
-	    }
-
-//	     Search by ID 
-	    @Override
-	    public Optional<Employee2> searchEmpById(int id) {
-	        return Optional.ofNullable(empMap.get(id));
-	    }
-
-	   
+	    return repository.findById(id)
+	        .map(emp -> {
+	            emp.setSalary(salary);
+	            emp.setDesignation(designation);
+	            repository.save(emp);
+	            return true;
+	        })
+	        .orElse(false);
 	}
 
 
+//	    Delete Employee By Id
+	@Override
+	public boolean deleteEmp(int id) {
+		repository.deleteById(id);
+		return true;
+	}
+
+//	     Get all employees
+	@Override
+	public List<Employee2> getAllEmp() {
+		return repository.findAll();
+	}
+
+//	     Search Employee by Id 
+	@Override
+	public Optional<Employee2> searchEmpById(int id) {
+		return repository.findById(id);
+	}
+
+}
