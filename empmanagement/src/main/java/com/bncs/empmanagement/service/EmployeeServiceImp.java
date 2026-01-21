@@ -22,33 +22,45 @@ public class EmployeeServiceImp implements EmployeeService {
 	@Override
 	public boolean addEmp(Employee2 employee) {
 
-		if (employee == null || employee.getId() <= 0 || employee.getSalary() < 0 || employee.getName() == null
-				|| employee.getName().isBlank() || employee.getDesignation() == null
-				|| employee.getDesignation().isBlank()) {
-			return false;
-		}
-
-		repository.save(employee);
-		return true;
-	}
-
-//	    Update Employee
-	@Override
-	public boolean updateEmp(int id, double salary, String designation) {
-
-	    if (salary < 0 || designation == null || designation.isBlank()) {
+	    if (employee == null ||
+	        employee.getName() == null || employee.getName().isBlank() ||
+	        employee.getDesignation() == null || employee.getDesignation().isBlank() ||
+	        employee.getSalary() < 0) {
 	        return false;
 	    }
 
+	    repository.save(employee); 
+	    return true;
+	}
+
+
+//	    Update Employee
+	@Override
+	public boolean updateEmp(int id, Employee2 updatedEmployee) {
+
+	    // Validate input
+	    if (updatedEmployee.getSalary() < 0 ||
+	        updatedEmployee.getDesignation() == null || updatedEmployee.getDesignation().isBlank()) {
+	        return false;
+	    }
+
+	    // Find employee by id and update all fields
 	    return repository.findById(id)
 	        .map(emp -> {
-	            emp.setSalary(salary);
-	            emp.setDesignation(designation);
+	            emp.setName(updatedEmployee.getName());
+	            emp.setAge(updatedEmployee.getAge());
+	            emp.setDesignation(updatedEmployee.getDesignation());
+	            emp.setDepartment(updatedEmployee.getDepartment());
+	            emp.setEmail(updatedEmployee.getEmail());
+	            emp.setGender(updatedEmployee.getGender());
+	            emp.setSalary(updatedEmployee.getSalary());
+
 	            repository.save(emp);
 	            return true;
 	        })
 	        .orElse(false);
 	}
+
 
 
 //	    Delete Employee By Id
