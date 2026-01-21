@@ -1,59 +1,144 @@
-package com.sbjpavalid02.emp02.service;
+package com.restapi.emp.service;
 
-import java.util.List;
+import com.restapi.emp.model.Employee;
+import com.restapi.emp.model.Gender;
+import com.restapi.emp.repository.EmployeeRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
 
-import org.springframework.stereotype.Service;
+import java.time.LocalDate;
+import java.util.*;
 
-import com.sbjpavalid02.emp02.model.Employee;
-import com.sbjpavalid02.emp02.repository.EmployeeRepository;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-@Service
-public class EmployeeServiceImpl implements EmployeeService {
+class EmployeeServiceImplTest {
 
-	private final EmployeeRepository repo;
+    @Mock
+    private EmployeeRepository repository;
 
-	public EmployeeServiceImpl(EmployeeRepository repo) {
-		this.repo = repo;
-	}
+    @InjectMocks
+    private EmployeeServiceImpl service;
 
-	@Override
-	public Employee addEmployee(Employee employee) {
+    private Employee emp;
 
-		if (repo.existsByEmployeeIdOrEmail(employee.getEmployeeId(), employee.getEmail())) {
-			throw new RuntimeException("Employee already exists");
-		}
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
 
-		return repo.save(employee);
-	}
+        emp = new Employee(1, "John Doe", "Developer", 5000, Gender.MALE, LocalDate.of(2022, 1, 1));
+    }
 
-	@Override
-	public Employee updateEmployee(int id, String designation, double salary, String email) {
+    // ---------------- ADD EMPLOYEE ----------------
+    @Test
+    void addEmployee_Success() {
+        when(repository.existsById(emp.getId())).thenReturn(false);
 
-		Employee emp = repo.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
+        boolean result = service.addEmployee(emp);
 
-		emp.setDesignation(designation);
-		emp.setSalary(salary);
-		emp.setEmail(email);
+        assertTrue(result);
+        verify(repository, times(1)).save(emp);
+    }
 
-		return repo.save(emp);
-	}
+    @Test
+    void addEmployee_Fail_Duplicate() {
+        when(repository.existsById(emp.getId())).thenReturn(true);
 
-	@Override
-	public boolean deleteEmployee(int id) {
-		if (!repo.existsById(id)) {
-			throw new RuntimeException("Employee not found");
-		}
-		repo.deleteById(id);
-		return true;
-	}
+        boolean result = service.addEmployee(emp);
 
-	@Override
-	public List<Employee> getAllEmployees() {
-		return repo.findAll();
-	}
+        assertFalse(result);
+        verify(repository, never()).save(emp);
+    }
 
-	@Override
-	public Employee getEmployeeById(int id) {
-		return repo.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
-	}
+    @Test
+    void addEmployee_Fail_InvalidData() {
+        Employee invalidEmp = new Employee(0, "", "", -100, null, LocalDate.now());
+
+        boolean result = service.addEmployee(invalidEmp);
+
+        assertFalse(result);
+        verify(repository, never()).save(any());
+    }
+
+    // ---------------- UPDATE EMPLOYEE ----------------
+    @Test
+    void updateEmployee_Success() {
+        when(repository.findById(emp.getId())).thenReturn(Optional.of(emp));
+
+        boolean result = service.updateEmployee(emp.getId(), 6000, "Senior Developer");
+
+        assertTrue(result);
+        assertEquals(6000, emp.getSalary());
+        assertEquals("Senior Developer", emp.getDesignation());
+        verify(repository, times(1)).save(emp);
+    }
+
+    @Test
+    void updateEmployee_Fail_InvalidSalaryOrDesignation() {
+        boolean result = service.updateEmployee(emp.getId(), -10, "");
+        assertFalse(result);
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void updateEmployee_Fail_NotFound() {
+        when(repository.findById(emp.getId())).thenReturn(Optional.empty());
+
+        boolean result = service.updateEmployee(emp.getId(), 6000, "Senior Developer");
+        assertFalse(result);
+        verify(repository, never()).save(any());
+    }
+
+    // ---------------- DELETE EMPLOYEE ----------------
+    @Test
+    void deleteEmployee_Success() {
+        when(repository.existsById(emp.getId())).thenReturn(true);
+
+        boolean result = service.deleteEmployee(emp.getId());
+
+        assertTrue(result);
+        verify(repository, times(1)).deleteById(emp.getId());
+    }
+
+    @Test
+    void deleteEmployee_Fail_NotFound() {
+        when(repository.existsById(emp.getId())).thenReturn(false);
+
+        boolean result = service.deleteEmployee(emp.getId());
+
+        assertFalse(result);
+        verify(repository, never()).deleteById(emp.getId());
+    }
+
+    // ---------------- GET EMPLOYEES ----------------
+    @Test
+    void getAllEmployees_ReturnsList() {
+        List<Employee> list = List.of(emp);
+        when(repository.findAll()).thenReturn(list);
+
+        List<Employee> result = service.getAllEmployees();
+
+        assertEquals(1, result.size());
+        assertEquals(emp, result.get(0));
+    }
+
+    @Test
+    void getEmployeeById_Found() {
+        when(repository.findById(emp.getId())).thenReturn(Optional.of(emp));
+
+        Optional<Employee> result = service.getEmployeeById(emp.getId());
+
+        assertTrue(result.isPresent());
+        assertEquals(emp, result.get());
+    }
+
+    @Test
+    void getEmployeeById_NotFound() {
+        when(repository.findById(emp.getId())).thenReturn(Optional.empty());
+
+        Optional<Employee> result = service.getEmployeeById(emp.getId());
+
+        assertTrue(result.isEmpty());
+    }
 }

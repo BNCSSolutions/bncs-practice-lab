@@ -1,51 +1,88 @@
-package com.sbjpavalid02.emp02.controller;
+package com.restapi.emp.controller;
 
+import com.restapi.emp.model.Employee;
+import com.restapi.emp.model.Gender;
+import com.restapi.emp.service.EmployeeService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
-import jakarta.validation.Valid;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import org.springframework.web.bind.annotation.*;
+@WebMvcTest(EmployeeController.class)
+class EmployeeControllerTest {
 
-import com.sbjpavalid02.emp02.model.Employee;
-import com.sbjpavalid02.emp02.service.EmployeeService;
+    @Autowired
+    private MockMvc mockMvc;
 
-@CrossOrigin(origins = "http://localhost:3000")
-@RestController
-@RequestMapping("/api/employees")
-public class EmployeeController {
+    @MockBean
+    private EmployeeService service;
 
-    private final EmployeeService service;
+    private final ObjectMapper mapper = new ObjectMapper();
 
-    public EmployeeController(EmployeeService service) {
-        this.service = service;
+    @Test
+    void addEmployee_ReturnsSuccess() throws Exception {
+        Employee emp = new Employee(1, "John Doe", "Developer", 5000, Gender.MALE, LocalDate.now());
+
+        when(service.addEmployee(any())).thenReturn(true);
+
+        mockMvc.perform(post("/employee/addEmp")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(emp)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee added"));
+
+        verify(service, times(1)).addEmployee(any());
     }
 
-    @PostMapping("/add")
-    public Employee addEmployee(@Valid @RequestBody Employee employee) {
-        return service.addEmployee(employee);
+    @Test
+    void getAllEmployees_ReturnsList() throws Exception {
+        Employee emp = new Employee(1, "John Doe", "Developer", 5000, Gender.MALE, LocalDate.now());
+        when(service.getAllEmployees()).thenReturn(List.of(emp));
+
+        mockMvc.perform(get("/employee/getEmp"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("John Doe"));
     }
 
-    @PutMapping("/update/{id}")
-    public Employee updateEmployee(
-            @PathVariable int id,
-            @RequestParam String designation,
-            @RequestParam double salary,
-            @RequestParam String email) {
-        return service.updateEmployee(id, designation, salary, email);
+    @Test
+    void getEmployeeById_Found() throws Exception {
+        Employee emp = new Employee(1, "John Doe", "Developer", 5000, Gender.MALE, LocalDate.now());
+        when(service.getEmployeeById(1)).thenReturn(Optional.of(emp));
+
+        mockMvc.perform(get("/employee/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("John Doe"));
     }
 
-    @DeleteMapping("/delete/{id}")
-    public boolean deleteEmployee(@PathVariable int id) {
-        return service.deleteEmployee(id);
+    @Test
+    void updateEmployee_ReturnsSuccess() throws Exception {
+        when(service.updateEmployee(1, 6000, "Senior Dev")).thenReturn(true);
+
+        mockMvc.perform(put("/employee/1")
+                        .param("salary", "6000")
+                        .param("designation", "Senior Dev"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee updated"));
     }
 
-    @GetMapping("/all")
-    public List<Employee> getAllEmployees() {
-        return service.getAllEmployees();
-    }
+    @Test
+    void deleteEmployee_ReturnsSuccess() throws Exception {
+        when(service.deleteEmployee(1)).thenReturn(true);
 
-    @GetMapping("/{id}")
-    public Employee getEmployee(@PathVariable int id) {
-        return service.getEmployeeById(id);
+        mockMvc.perform(delete("/employee/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Employee deleted"));
     }
 }
