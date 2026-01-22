@@ -1,18 +1,8 @@
 package com.restapi.emp.repository;
-
+import org.springframework.data.jpa.repository.JpaRepository;
 import com.restapi.emp.model.Employee;
-import java.util.List;
-import java.util.Optional;
 
-public interface EmployeeRepository {
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 
-    void save(Employee employee);
-
-    Optional<Employee> findById(int id);
-
-    List<Employee> findAll();
-
-    void deleteById(int id);
-
-    boolean existsById(int id);
+    boolean existsByEmployeeIdOrEmail(String employeeId, String email);
 }

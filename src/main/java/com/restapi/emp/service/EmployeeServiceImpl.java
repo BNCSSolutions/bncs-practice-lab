@@ -1,76 +1,60 @@
 package com.restapi.emp.service;
 
-import com.restapi.emp.model.Employee;
-import com.restapi.emp.repository.EmployeeRepository;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.restapi.emp.model.Employee;
+import com.restapi.emp.repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private final EmployeeRepository repository;
+	private final EmployeeRepository repo;
 
-    public EmployeeServiceImpl(EmployeeRepository repository) {
-        this.repository = repository;
-    }
+	public EmployeeServiceImpl(EmployeeRepository repo) {
+		this.repo = repo;
+	}
 
-    @Override
-    public boolean addEmployee(Employee employee) {
+	@Override
+	public Employee addEmployee(Employee employee) {
 
-        if (employee.getId() <= 0 ||
-            employee.getSalary() < 0 ||
-            employee.getName() == null || employee.getName().isBlank() ||
-            employee.getDesignation() == null || employee.getDesignation().isBlank()) {
-            return false;
-        }
+		if (repo.existsByEmployeeIdOrEmail(employee.getEmployeeId(), employee.getEmail())) {
+			throw new RuntimeException("Employee already exists");
+		}
 
-        if (repository.existsById(employee.getId())) {
-            return false;
-        }
+		return repo.save(employee);
+	}
 
-        repository.save(employee);
-        return true;
-    }
+	@Override
+	public Employee updateEmployee(int id, String designation, double salary, String email) {
 
-    @Override
-    public boolean updateEmployee(int id, double salary, String designation) {
+		Employee emp = repo.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        if (salary < 0 || designation == null || designation.isBlank()) {
-            return false;
-        }
+		emp.setDesignation(designation);
+		emp.setSalary(salary);
+		emp.setEmail(email);
 
-        Optional<Employee> empOpt = repository.findById(id);
-        if (empOpt.isEmpty()) {
-            return false;
-        }
+		return repo.save(emp);
+	}
 
-        Employee emp = empOpt.get();
-        emp.setSalary(salary);
-        emp.setDesignation(designation);
+	@Override
+	public boolean deleteEmployee(int id) {
+		if (!repo.existsById(id)) {
+			throw new RuntimeException("Employee not found");
+		}
+		repo.deleteById(id);
+		return true;
+	}
 
-        repository.save(emp);
-        return true;
-    }
+	@Override
+	public List<Employee> getAllEmployees() {
+		return repo.findAll();
+	}
 
-    @Override
-    public boolean deleteEmployee(int id) {
-        if (!repository.existsById(id)) {
-            return false;
-        }
-        repository.deleteById(id);
-        return true;
-    }
-
-    @Override
-    public List<Employee> getAllEmployees() {
-        return repository.findAll();
-    }
-
-    @Override
-    public Optional<Employee> getEmployeeById(int id) {
-        return repository.findById(id);
-    }
+	@Override
+	public Employee getEmployeeById(int id) {
+		return repo.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
+	}
 }
 

@@ -1,19 +1,13 @@
 package com.restapi.emp.service;
 
+import java.util.List;
+
 import com.restapi.emp.model.Employee;
 
-import java.util.List;
-import java.util.Optional;
-
 public interface EmployeeService {
-
-    boolean addEmployee(Employee employee);
-
-    boolean updateEmployee(int id, double salary, String designation);
-
+    Employee addEmployee(Employee employee);
+    Employee updateEmployee(int id, String designation, double salary, String email);
     boolean deleteEmployee(int id);
-
     List<Employee> getAllEmployees();
-
-    Optional<Employee> getEmployeeById(int id);
+    Employee getEmployeeById(int id);
 }
