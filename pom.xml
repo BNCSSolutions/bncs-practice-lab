@@ -9,15 +9,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.1</version>
+        <version>3.2.2</version>
         <relativePath/>
     </parent>
 
-    <groupId>com.restapi</groupId>
-    <artifactId>emp</artifactId>
+    <groupId>com.sbjpavalid02</groupId>
+    <artifactId>emp02</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>emp</name>
-    <description>Employee Management REST API</description>
+    <name>emp02</name>
 
     <properties>
         <java.version>21</java.version>
@@ -25,13 +24,40 @@
 
     <dependencies>
 
-        <!-- Spring Boot Web (REST API) -->
+        <!-- Spring Web (REST + MVC) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
-        <!-- Testing -->
+        <!-- Spring Data JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
+        <!-- Bean Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- MySQL -->
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- DevTools -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- ⭐ TESTING (JUnit 5 + Mockito + MockMvc) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>

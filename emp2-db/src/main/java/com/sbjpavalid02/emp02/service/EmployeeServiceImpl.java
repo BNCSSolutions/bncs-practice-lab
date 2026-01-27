@@ -1,11 +1,11 @@
-package com.restapi.emp.service;
+package com.sbjpavalid02.emp02.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.restapi.emp.model.Employee;
-import com.restapi.emp.repository.EmployeeRepository;
+import com.sbjpavalid02.emp02.model.Employee;
+import com.sbjpavalid02.emp02.repository.EmployeeRepository;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -57,4 +57,3 @@ public class EmployeeServiceImpl implements EmployeeService {
 		return repo.findById(id).orElseThrow(() -> new RuntimeException("Employee not found"));
 	}
 }
-

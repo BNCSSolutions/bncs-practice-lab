@@ -1,6 +1,8 @@
-package com.restapi.emp.repository;
+package com.sbjpavalid02.emp02.repository;
+
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.restapi.emp.model.Employee;
+
+import com.sbjpavalid02.emp02.model.Employee;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
 

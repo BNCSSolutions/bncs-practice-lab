@@ -1,8 +1,8 @@
-package com.restapi.emp.service;
+package com.sbjpavalid02.emp02.service;
 
 import java.util.List;
 
-import com.restapi.emp.model.Employee;
+import com.sbjpavalid02.emp02.model.Employee;
 
 public interface EmployeeService {
     Employee addEmployee(Employee employee);
